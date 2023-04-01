@@ -11,36 +11,56 @@ public class Dots {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
+        int jogada = sc.nextInt();
+        boolean jogador = false;
+        boolean novoPonto, erro;
+        boolean[] jogadasPossiveis = new boolean[12];
 
+        Nos noRaiz = new Nos();
+        noRaiz.formata();
+        noRaiz.jogada(0, 1);
+        jogadasPossiveis[0] = true;
+
+        System.out.println("Digite a posicao da jogada (Jogador 1):");
+
+        Coordenada coordenada = Nos.mapear(jogada);
+
+        erro = noRaiz.jogada(coordenada.linha, coordenada.coluna);
+        if (erro == false) {
+            while (erro == false) {
+                jogada = sc.nextInt();
+                coordenada = Nos.mapear(jogada);
+                erro = noRaiz.jogada(coordenada.linha, coordenada.coluna);
+            }
+        }
+        jogadasPossiveis[jogada - 1] = true;
+        noRaiz.imprime();
+        preencheJogadas(jogadasPossiveis, jogador, noRaiz);
+
+        ////
         TabuleiroDots tabuleiro = new TabuleiroDots();
         tabuleiro.formata();
 
-        int jogador = 1;
-        
+        tabuleiro.jogada(0, 1);
 
-        boolean erro, novoPonto, estado = false;
-        boolean[] jogadasPossiveis = new boolean[10];
-
-        System.out.println("Digite a posicao da jogada (Jogador " + jogador + "):");
+        /*System.out.println("Digite a posicao da jogada (Jogador " + jogador + "):");
         int jogada = sc.nextInt();
         Coordenada coordenada = tabuleiro.mapear(jogada);
-        erro = tabuleiro.jogada(coordenada.linha, coordenada.linha);
+        erro = tabuleiro.jogada(coordenada.linha, coordenada.coluna);
         if (erro == false) {
             while (erro == false) {
                 jogada = sc.nextInt();
                 coordenada = tabuleiro.mapear(jogada);
-                erro = tabuleiro.jogada(coordenada.linha, coordenada.linha);
+                erro = tabuleiro.jogada(coordenada.linha, coordenada.coluna);
             }
         }
         tabuleiro.imprime();
-        tabuleiro.jogada(0, 1);
-        
+
         Nos no = new Nos(0, jogadasPossiveis, estado);
-        
+
         minMax(no);
 
         //jnnhnhnhnhnh
-
         while (tabuleiro.finalizado() != 0) {
             System.out.println("Digite a posicao da jogada (Jogador " + jogador + "):");
             jogada = sc.nextInt();
@@ -74,67 +94,165 @@ public class Dots {
                 }
             }
         }
-        System.out.println("Fim de Jogo!");
+        System.out.println("Fim de Jogo!");*/
     }
-    
-    public static int max(int a, int b){
-        if( a > b){
+
+    public static void preencheJogadas(boolean[] jogadasPossiveis, boolean jogador, Nos no) {
+        for (int i = 0; i < jogadasPossiveis.length; i++) {
+            if (jogadasPossiveis[i] == false) {
+                jogadasPossiveis[i] = true;
+                Nos filho = new Nos(no.tabuleiro);
+                Coordenada coordenada = Nos.mapear(i + 1);
+                boolean erro = filho.jogada(coordenada.linha, coordenada.coluna);
+                no.filhos.add(filho);
+                if (!jogador) {
+                    filho.valorMinMax = Integer.MIN_VALUE;
+                } else {
+                    filho.valorMinMax = Integer.MAX_VALUE;
+                }
+
+                if (filho.condicao(coordenada.linha, coordenada.coluna, erro, jogador)) {
+                    preencheJogadas(jogadasPossiveis, jogador, filho);
+                } else {
+
+                    preencheJogadas(jogadasPossiveis, !jogador, filho);
+
+                }
+                jogadasPossiveis[i] = false;
+            }
+        }
+    }
+
+    public static int max(int a, int b) {
+        if (a > b) {
+            return a;
+        } else if (a < b) {
+            return b;
+        } else {
             return a;
         }
-        else if (a < b){
-            return b;
-        }
-        else return a;
     }
-    
-    public static int min(int a, int b){
-        if( a < b){
+
+    public static int min(int a, int b) {
+        if (a < b) {
+            return a;
+        } else if (a > b) {
+            return b;
+        } else {
             return a;
         }
-        else if (a > b){
-            return b;
-        }
-        else return a;
     }
-    
-    public static int logicaDeDecisao(Nos no){
+
+    /*public static int logicaDeDecisao(Nos no) {
+        int pontuacao = 0;
         Coordenada coordenada = TabuleiroDots.mapear(no.valorMinMax);
-        if (coordenada.linha >= 5 || coordenada.linha < 0 || coordenada.coluna >= 5 || coordenada.coluna < 0) {
-            System.out.println("Local Invalido, tente novamente:");
-            return false;
-
-        } else if (no.tabuleiro[coordenada.linha][coordenada.coluna].equals("-") || no.tabuleiro[coordenada.linha][coordenada.coluna].equals("|")) {
+        if (no.tabuleiro[coordenada.linha][coordenada.coluna].equals("-") || no.tabuleiro[coordenada.linha][coordenada.coluna].equals("|")) {
             //System.out.println("Local ja ocupado por um traco! Tente novamente:");
-            return false;
-
-        }       
-        
-        
-        
-        else if (no.tabuleiro[coordenada.linha][coordenada.coluna].equals("*")) {
-            System.out.println("Posicao Invalida! Tente novamente:");
-            return false;
-
-        } else if (coordenada.linha % 2 != 0 && coordenada.coluna % 2 == 0) {
-            no.tabuleiro[coordenada.linha][coordenada.coluna] = "|";
-            return true;
-
-        } else if (coordenada.linha % 2 == 0 && coordenada.coluna % 2 != 0) {
-            no.tabuleiro[coordenada.linha][coordenada.coluna] = "-";
-            return true;
+            pontuacao--;
 
         }
-        
-        return resultado;
-    }
-    
-    
+        if ((coordenada.linha + 2) < 5 && (coordenada.coluna + 1) < 5 && (coordenada.coluna - 1 >= 0)) {
+            if (no.tabuleiro[coordenada.linha][coordenada.coluna].equals("|")) {
+                if (no.jogador == true) {
+                    pontuacao++;
+                } else {
+                    pontuacao--;
+                }
 
-    public static int minMax(Nos no) {
+            }
+            if (no.tabuleiro[coordenada.linha][coordenada.coluna - 2].equals("|")) {
+                if (no.jogador == true) {
+                    pontuacao++;
+                } else {
+                    pontuacao--;
+                }
+            }
+            if (no.tabuleiro[coordenada.linha - 1][coordenada.coluna - 1].equals("-")) {
+                if (no.jogador == true) {
+                    pontuacao++;
+                } else {
+                    pontuacao--;
+                }
+            }
+            if (no.tabuleiro[coordenada.linha + 1][coordenada.coluna - 1].equals("-")) {
+                if (no.jogador == true) {
+                    pontuacao++;
+                } else {
+                    pontuacao--;
+                }
+
+            }
+        }
+        if ((coordenada.linha + 2) < 5 && (coordenada.coluna + 1) < 5 && (coordenada.coluna - 1 >= 0)) {
+            if (no.tabuleiro[coordenada.linha][coordenada.coluna].equals("|")) {
+                if (no.jogador == true) {
+                    pontuacao++;
+                } else {
+                    pontuacao--;
+                }
+
+            }
+            if (no.tabuleiro[coordenada.linha][coordenada.coluna + 2].equals("|")) {
+                if (no.jogador == true) {
+                    pontuacao++;
+                } else {
+                    pontuacao--;
+                }
+            }
+            if (no.tabuleiro[coordenada.linha + 1][coordenada.coluna + 1].equals("-")) {
+                if (no.jogador == true) {
+                    pontuacao++;
+                } else {
+                    pontuacao--;
+                }
+            }
+            if (no.tabuleiro[coordenada.linha - 1][coordenada.coluna + 1].equals("-")) {
+                if (no.jogador == true) {
+                    pontuacao++;
+                } else {
+                    pontuacao--;
+                }
+            }
+        }
+        if ((coordenada.linha + 2) < 5 && (coordenada.coluna + 1) < 5 && (coordenada.coluna - 1 >= 0)) {
+            if (no.tabuleiro[coordenada.linha][coordenada.coluna].equals("-")) {
+                if (no.jogador == true) {
+                    pontuacao++;
+                } else {
+                    pontuacao--;
+                }
+            }
+            if (no.tabuleiro[coordenada.linha + 2][coordenada.coluna].equals("-")) {
+                if (no.jogador == true) {
+                    pontuacao++;
+                } else {
+                    pontuacao--;
+                }
+            }
+            if (no.tabuleiro[coordenada.linha + 1][coordenada.coluna + 1].equals("|")) {
+                if (no.jogador == true) {
+                    pontuacao++;
+                } else {
+                    pontuacao--;
+                }
+            }
+            if (no.tabuleiro[coordenada.linha + 1][coordenada.coluna - 1].equals("|")) {
+                if (no.jogador == true) {
+                    pontuacao++;
+                } else {
+                    pontuacao--;
+                }
+            }
+        }
+
+        return pontuacao;
+    }*/
+
+    /*public static int minMax(Nos no) {
 
         if (no.filhos.isEmpty() || no.nivel == 0) {
             System.out.println("Fim do no");
-            no.valorMinMax = logicaDeDecisao();
+            no.valorMinMax = logicaDeDecisao(no);
             return no.valorMinMax;
         }
         if (no.jogador == true) {
@@ -142,7 +260,7 @@ public class Dots {
             for (Nos filhos : no.filhos) {
                 no.nivel--;
                 no.jogador = false;
-                valorMinMax = minMax(no);
+                no.valorMinMax = minMax(no);
                 no.maximizar = max(no.maximizar, 1);
                 no.alpha = max(no.alpha, 2);
                 if (no.beta <= no.alpha) {
@@ -158,18 +276,16 @@ public class Dots {
             for (Nos filhos : no.filhos) {
                 no.nivel--;
                 no.jogador = true;
-                valorMinMax = minMax(no);
+                no.valorMinMax = minMax(no);
                 no.minimizar = min(no.minimizar, 1);
                 no.beta = min(no.beta, 2);
-                if (no.beta <= no.alpha){
+                if (no.beta <= no.alpha) {
                     break;
-                }else{
-                    
                 }
             }
             System.out.println(no.minimizar);
             return no.minimizar;
         }
-    }
+    }*/
 
 }
