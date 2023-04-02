@@ -11,7 +11,7 @@ public class Dots {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        int jogada;
+        int jogada = sc.nextInt();
         boolean jogador = false;
         boolean novoPonto, erro;
         boolean[] jogadasPossiveis = new boolean[12];
@@ -22,7 +22,6 @@ public class Dots {
         jogadasPossiveis[0] = true;
 
         System.out.println("Digite a posicao da jogada (Jogador 1):");
-        jogada = sc.nextInt();
 
         Coordenada coordenada = Nos.mapear(jogada);
 
@@ -38,41 +37,77 @@ public class Dots {
         noRaiz.imprime();
         preencheJogadas(jogadasPossiveis, jogador, noRaiz);
 
-        
+        ////
+        TabuleiroDots tabuleiro = new TabuleiroDots();
+        tabuleiro.formata();
 
-        /*if (novoPonto == true) {
-            System.out.println("Ponto! Jogador " + jogador + " joga novamente!");
-            tabuleiro.imprime();
-        } else {
-            switch (jogador) {
-                case 1:
-                    jogador = 2;
+        tabuleiro.jogada(0, 1);
 
-                    break;
-                case 2:
-                    jogador = 1;
-                    break;
-                default:
-                    jogador = 0;
-                    break;
+        /*System.out.println("Digite a posicao da jogada (Jogador " + jogador + "):");
+        int jogada = sc.nextInt();
+        Coordenada coordenada = tabuleiro.mapear(jogada);
+        erro = tabuleiro.jogada(coordenada.linha, coordenada.coluna);
+        if (erro == false) {
+            while (erro == false) {
+                jogada = sc.nextInt();
+                coordenada = tabuleiro.mapear(jogada);
+                erro = tabuleiro.jogada(coordenada.linha, coordenada.coluna);
             }
         }
-        System.out.println("Fim de Jogo!");  */
+        tabuleiro.imprime();
+
+        Nos no = new Nos(0, jogadasPossiveis, estado);
+
+        minMax(no);
+
+        //jnnhnhnhnhnh
+        while (tabuleiro.finalizado() != 0) {
+            System.out.println("Digite a posicao da jogada (Jogador " + jogador + "):");
+            jogada = sc.nextInt();
+            coordenada = tabuleiro.mapear(jogada);
+
+            erro = tabuleiro.jogada(coordenada.linha, coordenada.linha);
+            if (erro == false) {
+                while (erro == false) {
+                    coordenada.linha = sc.nextInt();
+                    coordenada.linha = sc.nextInt();
+                    erro = tabuleiro.jogada(coordenada.linha, coordenada.linha);
+                }
+            }
+            novoPonto = tabuleiro.condicao(coordenada.linha, coordenada.linha, erro, jogador);
+            tabuleiro.imprime();
+            if (novoPonto == true) {
+                System.out.println("Ponto! Jogador " + jogador + " joga novamente!");
+                tabuleiro.imprime();
+            } else {
+                switch (jogador) {
+                    case 1:
+                        jogador = 2;
+
+                        break;
+                    case 2:
+                        jogador = 1;
+                        break;
+                    default:
+                        jogador = 0;
+                        break;
+                }
+            }
+        }
+        System.out.println("Fim de Jogo!");*/
     }
 
     public static void preencheJogadas(boolean[] jogadasPossiveis, boolean jogador, Nos no) {
         for (int i = 0; i < jogadasPossiveis.length; i++) {
             if (jogadasPossiveis[i] == false) {
                 jogadasPossiveis[i] = true;
-                Nos filho = new Nos(no.tabuleiro, no);
+                Nos filho = new Nos(no.tabuleiro);
                 Coordenada coordenada = Nos.mapear(i + 1);
                 boolean erro = filho.jogada(coordenada.linha, coordenada.coluna);
                 no.filhos.add(filho);
                 if (!jogador) {
-                    //fazerJogada(no, jogada);
                     filho.valorMinMax = Integer.MIN_VALUE;
                 } else {
-
                     filho.valorMinMax = Integer.MAX_VALUE;
                 }
 
@@ -85,30 +120,6 @@ public class Dots {
                 }
                 jogadasPossiveis[i] = false;
             }
-        }
-    }
-    
-    public static void fazerJogada(Nos no, int jogada){
-        Scanner sc = new Scanner(System.in);
-        if(no.jogador){
-            System.out.println("Digite a posicao da jogada (Jogador " + no.jogador + "):");
-        }        
-        jogada = sc.nextInt();
-        Coordenada coordenada = no.mapear(jogada);
-
-        boolean erro = no.jogada(coordenada.linha, coordenada.linha);
-        if (erro == false) {
-            while (erro == false) {
-                coordenada.linha = sc.nextInt();
-                coordenada.linha = sc.nextInt();
-                erro = no.jogada(coordenada.linha, coordenada.linha);
-            }
-        }
-        boolean novoPonto = no.condicao(coordenada.linha, coordenada.linha, erro, no.jogador);
-        no.imprime();
-        if (novoPonto == true) {
-            System.out.println("Ponto! Jogador " + no.jogador + " joga novamente!");
-            no.imprime();
         }
     }
 
@@ -132,9 +143,9 @@ public class Dots {
         }
     }
 
-    public static int logicaDeDecisao(Nos no) {
+    /*public static int logicaDeDecisao(Nos no) {
         int pontuacao = 0;
-        Coordenada coordenada = no.mapear(no.valorMinMax);
+        Coordenada coordenada = TabuleiroDots.mapear(no.valorMinMax);
         if (no.tabuleiro[coordenada.linha][coordenada.coluna].equals("-") || no.tabuleiro[coordenada.linha][coordenada.coluna].equals("|")) {
             //System.out.println("Local ja ocupado por um traco! Tente novamente:");
             pontuacao--;
@@ -235,14 +246,13 @@ public class Dots {
         }
 
         return pontuacao;
-    }
+    }*/
 
-    public static int minMax(Nos no) {
+    /*public static int minMax(Nos no) {
 
         if (no.filhos.isEmpty() || no.nivel == 0) {
-            //System.out.println("Fim do no");
+            System.out.println("Fim do no");
             no.valorMinMax = logicaDeDecisao(no);
-            System.out.println(no.valorMinMax);
             return no.valorMinMax;
         }
         if (no.jogador == true) {
@@ -276,6 +286,6 @@ public class Dots {
             System.out.println(no.minimizar);
             return no.minimizar;
         }
-    }
+    }*/
 
 }

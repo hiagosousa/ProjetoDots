@@ -6,6 +6,7 @@
 package projetoDots;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  *
@@ -19,11 +20,11 @@ public class Nos {
     public int valorMinMax, nivel;
     public boolean jogador;
     int alpha, beta;
+    Random gerador;
 
-    public Nos(String[][] tabuleiro, Nos filho) {
+    public Nos(String[][] tabuleiro) {
         this.tabuleiro = tabuleiro;
         this.filhos = new ArrayList();
-        Dots.minMax(filho);
     }
 
     public Nos() {
@@ -41,6 +42,7 @@ public class Nos {
         this.beta = Integer.MAX_VALUE;
         this.filhos = new ArrayList();
         this.jogador = estado;
+        this.gerador = new Random();
 
         //formataIA();
         //preencheJogadas(jogadasPossiveis, estado, tabuleiro);
@@ -138,6 +140,27 @@ public class Nos {
         return false;
     }
 
+    public final void preencheJogadas(boolean[] jogadasPossiveis, boolean estado, String tabuleiro[][]) {
+        for (int i = 0; i < jogadasPossiveis.length; i++) {
+            if (jogadasPossiveis[i] == false) {
+                jogadasPossiveis[i] = true;
+                int randResult = 0;
+                randResult = gerador.nextInt(2, 12);
+                Coordenada coordenada = (TabuleiroDots.mapear(randResult));
+                boolean erro = jogadaIA(coordenada.linha, coordenada.coluna);
+                if (erro == false) {
+                    while (erro == false) {
+                        randResult = gerador.nextInt(2, 12);
+                        coordenada = (TabuleiroDots.mapear(randResult));
+                        erro = jogadaIA(coordenada.linha, coordenada.coluna);
+                    }
+                }
+                //System.out.println("Posicao " + randResult);
+                filhos.add(new Nos(i, jogadasPossiveis, estado));
+                jogadasPossiveis[i] = false;
+            }
+        }
+    }
 
     public void formataIA() {
 
@@ -219,38 +242,5 @@ public class Nos {
             }
             System.out.println();
         }
-    }
-    
-        public int finalizado() {
-        int pontuacao1 = 0, pontuacao2 = 0;
-        int contador = 0;
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
-                if (tabuleiro[i][j].equals(" ")) {
-                    contador++;
-                }
-                if (tabuleiro[i][j].equals("1")) {
-                    pontuacao1++;
-                }
-                if (tabuleiro[i][j].equals("2")) {
-                    pontuacao2++;
-                }
-            }
-        }
-        if (contador == 0) {
-            System.out.println("\nPontuacao FINAL:\nJogador 1: " + pontuacao1 + " ponto(s);\nJogador 2: " + pontuacao2 + " ponto(s);\n");
-            if (pontuacao1 > pontuacao2) {
-                System.out.println("Vencedor:\nJogador 1!");
-            }
-            if (pontuacao1 < pontuacao2) {
-                System.out.println("Vencedor:\nJogador 2!");
-            }
-            if (pontuacao1 == pontuacao2) {
-                System.out.println("Resultado: Empate!");
-            }
-        } else {
-            System.out.println("\nPontuacao atual:\nJogador 1: " + pontuacao1 + " ponto(s);\nJogador 2: " + pontuacao2 + " ponto(s);\n");
-        }
-        return contador;
     }
 }
