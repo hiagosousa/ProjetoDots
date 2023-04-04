@@ -12,27 +12,30 @@ import java.util.Random;
  *
  * @author 201911020023
  */
-public class Nos {
+public class No {
 
     public String[][] tabuleiro;
-    public ArrayList<Nos> filhos;
+    public ArrayList<No> filhos;
     public int maximizar, minimizar;
     public int valorMinMax, nivel;
     public boolean jogador;
     int alpha, beta;
     Random gerador;
 
-    public Nos(String[][] tabuleiro) {
-        this.tabuleiro = tabuleiro;
+    public No(String[][] tabuleiro) {
+        this.tabuleiro = new String[5][5];
+        for (int i = 0; i < 5; i++) {
+            System.arraycopy(tabuleiro[i], 0, this.tabuleiro[i], 0, 5);
+        }
         this.filhos = new ArrayList();
     }
 
-    public Nos() {
+    public No() {
         this.tabuleiro = new String[5][5];
         this.filhos = new ArrayList();
     }
 
-    public Nos(int i, boolean[] jogadasPossiveis, boolean estado) {
+    public No(int i, boolean[] jogadasPossiveis, boolean estado) {
         this.tabuleiro = new String[5][5];
         this.valorMinMax = 0;
         this.maximizar = 0;
@@ -62,6 +65,42 @@ public class Nos {
         }
     }
 
+    public int finalizado() {
+        int pontuacao1 = 0, pontuacao2 = 0;
+        int contador = 0;
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                if (tabuleiro[i][j].equals(" ")) {
+                    contador++;
+                }
+                if (tabuleiro[i][j].equals("1")) {
+                    pontuacao1++;
+                }
+                if (tabuleiro[i][j].equals("2")) {
+                    pontuacao2++;
+                }
+            }
+        }
+        if (contador == 0) {
+            //System.out.println("\nPontuacao FINAL:\nJogador 1: " + pontuacao1 + " ponto(s);\nJogador 2: " + pontuacao2 + " ponto(s);\n");
+            if (pontuacao1 > pontuacao2) {
+                //System.out.println("Vencedor:\nJogador 1!");
+                return -1;
+            }
+            if (pontuacao1 < pontuacao2) {
+                //System.out.println("Vencedor:\nJogador 2!");
+                return 1;
+            }
+            if (pontuacao1 == pontuacao2) {
+                //System.out.println("Resultado: Empate!");
+                return 0;
+            }
+        } else {
+            //System.out.println("\nPontuacao atual:\nJogador 1: " + pontuacao1 + " ponto(s);\nJogador 2: " + pontuacao2 + " ponto(s);\n");
+        }
+        return 2;
+    }
+
     public boolean condicao(int jogadaX, int jogadaY, boolean erro, boolean jogador) {
         int novoQuadrado = 0;
         if (erro == true) {
@@ -83,8 +122,9 @@ public class Nos {
                     } else {
                         tabuleiro[jogadaX][jogadaY + 1] = "2";
                     }
+                    novoQuadrado++;
                 }
-                novoQuadrado++;
+
             }
         }
         if ((jogadaX + 2) < 5 && (jogadaY + 1) < 5 && (jogadaY - 1 >= 0)) {
@@ -104,8 +144,9 @@ public class Nos {
                 } else {
                     tabuleiro[jogadaX - 1][jogadaY] = "2";
                 }
+                novoQuadrado++;
             }
-            novoQuadrado++;
+
         }
         if (novoQuadrado > 0) {
             return true;
@@ -138,28 +179,6 @@ public class Nos {
         }
         System.out.println("Local Inexistente no jogo. Digite outro:");
         return false;
-    }
-
-    public final void preencheJogadas(boolean[] jogadasPossiveis, boolean estado, String tabuleiro[][]) {
-        for (int i = 0; i < jogadasPossiveis.length; i++) {
-            if (jogadasPossiveis[i] == false) {
-                jogadasPossiveis[i] = true;
-                int randResult = 0;
-                randResult = gerador.nextInt(2, 12);
-                Coordenada coordenada = (TabuleiroDots.mapear(randResult));
-                boolean erro = jogadaIA(coordenada.linha, coordenada.coluna);
-                if (erro == false) {
-                    while (erro == false) {
-                        randResult = gerador.nextInt(2, 12);
-                        coordenada = (TabuleiroDots.mapear(randResult));
-                        erro = jogadaIA(coordenada.linha, coordenada.coluna);
-                    }
-                }
-                //System.out.println("Posicao " + randResult);
-                filhos.add(new Nos(i, jogadasPossiveis, estado));
-                jogadasPossiveis[i] = false;
-            }
-        }
     }
 
     public void formataIA() {
