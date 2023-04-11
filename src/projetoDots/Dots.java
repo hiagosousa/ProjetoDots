@@ -38,9 +38,7 @@ public class Dots {
         noRaiz.imprime();
         preencheJogadas(jogadasPossiveis, jogador, noRaiz);
         minmax(noRaiz, jogador);
-        
-        
-        
+
         System.out.println("finalizei");
         ////
 
@@ -97,31 +95,109 @@ public class Dots {
         }
         System.out.println("Fim de Jogo!");*/
     }
-    
-    public void imprimeFinal(){
-        for(int i = 0; i < 5; i++){
-            for(int j = 0; j < 5; j++){
+
+    public void imprimeFinal(String[][] tabuleiroFinal) {
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
                 System.out.println(" " + tabuleiroFinal[i][j]);
             }
-            System.out.println("");           
+            System.out.println("");
         }
         System.out.println("");
     }
-    
-    public void fazerAsJogadas(No noRaiz, boolean jogador){
-        imprimeFinal();
-        
-        int ganhador = noRaiz.finalizado();
-        if(ganhador != 2){
-            System.out.println("Vencedor: "+ ganhador);
-            
-        }
-        else{
-            if(!jogador){
+
+    public int fazAsJogadas(No no, boolean jogador, String[][] tabuleiroFinal) {
+        imprimeFinal(tabuleiroFinal);
+
+        int vencedor = no.finalizado();
+        if (vencedor != 2) {
+            System.out.println("Vencedor: " + vencedor);
+
+        } else {
+            if (!jogador) {
+                int maximizacao = Integer.MIN_VALUE;
+                int posicaoDecidida = 0;
+                for (int i = 0; i < no.filhos.size(); i++) {
+                    if (no.filhos.get(i).valorMinMax > maximizacao) {
+                        maximizacao = no.filhos.get(i).valorMinMax;
+                        posicaoDecidida = i;
+                    }
+                }
+
+                Coordenada coordenada = new Coordenada(0,0);
+
+                for (int i = 0; i < 5; i++) {
+                    for (int j = 0; j < 5; j++) {
+                        if (!(no.filhos.get(posicaoDecidida).tabuleiro[i][j].equals(tabuleiroFinal[i][j])) && no.filhos.get(posicaoEscolhida).tabuleiro[i][j] != 2 && no.filhos.get(posicaoEscolhida).tabuleiro[i][j] != 1) {
+                            coordenada.linha = i;
+                            coordenada.coluna = j;
+                        }
+                    }
+                }
+
+                adicionaNoTabuleiro(no.filhos.get(posicaoDecidida).tabuleiro, tabuleiroFinal);
                 
+
+                if (no.filhos.get(posicaoDecidida).condicao(coordenada.linha, coordenada.coluna, true, false)) {
+                    fazAsJogadas(no, jogador, tabuleiroFinal);
+                } else {
+                    fazAsJogadas(no, !jogador, tabuleiroFinal);
+                }
+
+            } else {
+                int posicaoDecidida = 0;
+                Scanner sc = new Scanner(System.in);
+                System.out.println("Digite a posicao da jogada (Jogador " + jogador + "):");
+                int jogada = sc.nextInt();
+                Coordenada coordenada = no.mapear(jogada);
+
+                boolean erro = no.jogada(coordenada.linha, coordenada.linha);
+                if (erro == false) {
+                    while (erro == false) {
+                        coordenada.linha = sc.nextInt();
+                        coordenada.linha = sc.nextInt();
+                        erro = no.jogada(coordenada.linha, coordenada.linha);
+                    }
+                }
+                int contador = 0;
+                for( No filho : no.filhos){
+      
+                    if(igualdadeDosTabuleiros(no.tabuleiro, tabuleiroFinal)){
+                        posicaoDecidida = contador;
+                    }
+                    contador++;
+                }
+                
+                if(no.filhos.get(posicaoDecidida).condicao(coordenada.linha, coordenada.coluna, erro, false)){
+                    System.out.println("Ponto do jogador");
+                    fazAsJogadas(no, jogador, tabuleiroFinal);
+                } else{
+                    fazAsJogadas(no, !jogador, tabuleiroFinal);
+                }
+
             }
-            
+
         }
+        return 0;
+    }
+    
+    public void adicionaNoTabuleiro(String[][] tabuleiro, String[][] tabuleiroFinal){
+        for(int i = 0; i < 5; i++){
+            for(int j = 0; j < 5; j++){
+                tabuleiroFinal[i][j] = tabuleiro[i][j];
+            }
+        }
+    }
+    
+    public boolean igualdadeDosTabuleiros(String[][] tabuleiro, String[][]tabuleiroFinal){
+        for(int i=0; i < 5; i++){
+            for(int j=0; j < 5; j++){
+                if(tabuleiro[i][j] != tabuleiroFinal[i][j]){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public static int minmax(No no, boolean jogador) {
@@ -204,7 +280,7 @@ public class Dots {
         }
     }
 
-    public static int logicaDeDecisao(No no) {
+    /*public static int logicaDeDecisao(No no) {
         int pontuacao = 0;
         Coordenada coordenada = no.mapear(no.valorMinMax);
         if (no.tabuleiro[coordenada.linha][coordenada.coluna].equals("-") || no.tabuleiro[coordenada.linha][coordenada.coluna].equals("|")) {
@@ -308,8 +384,9 @@ public class Dots {
 
         return pontuacao;
     }
+     */
 
-    /*public static int minMax(Nos no) {
+ /*public static int minMax(Nos no) {
 
         if (no.filhos.isEmpty() || no.nivel == 0) {
             System.out.println("Fim do no");
