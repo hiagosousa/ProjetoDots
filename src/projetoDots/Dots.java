@@ -9,13 +9,14 @@ import java.util.Scanner;
 
 public class Dots {
 
+    public static String[][] tabuleiroFinal = new String[5][5];
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int jogada;
         boolean jogador = false;
         boolean novoPonto, erro;
         boolean[] jogadasPossiveis = new boolean[12];
-        String[][] tabuleiroFinal = new String[5][5];
 
         No noRaiz = new No();
         noRaiz.formata();
@@ -34,80 +35,34 @@ public class Dots {
                 erro = noRaiz.jogada(coordenada.linha, coordenada.coluna);
             }
         }
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                tabuleiroFinal[i][j] = noRaiz.tabuleiro[i][j];
+            }
+        }
+
         jogadasPossiveis[jogada - 1] = true;
         noRaiz.imprime();
         preencheJogadas(jogadasPossiveis, jogador, noRaiz);
         minmax(noRaiz, jogador);
-
+        fazAsJogadas(noRaiz, jogador);
         System.out.println("finalizei");
-        ////
 
-        /*System.out.println("Digite a posicao da jogada (Jogador " + jogador + "):");
-        int jogada = sc.nextInt();
-        Coordenada coordenada = tabuleiro.mapear(jogada);
-        erro = tabuleiro.jogada(coordenada.linha, coordenada.coluna);
-        if (erro == false) {
-            while (erro == false) {
-                jogada = sc.nextInt();
-                coordenada = tabuleiro.mapear(jogada);
-                erro = tabuleiro.jogada(coordenada.linha, coordenada.coluna);
-            }
-        }
-        tabuleiro.imprime();
-
-        Nos no = new Nos(0, jogadasPossiveis, estado);
-
-        minMax(no);
-
-        //jnnhnhnhnhnh
-        while (tabuleiro.finalizado() != 0) {
-            System.out.println("Digite a posicao da jogada (Jogador " + jogador + "):");
-            jogada = sc.nextInt();
-            coordenada = tabuleiro.mapear(jogada);
-
-            erro = tabuleiro.jogada(coordenada.linha, coordenada.linha);
-            if (erro == false) {
-                while (erro == false) {
-                    coordenada.linha = sc.nextInt();
-                    coordenada.linha = sc.nextInt();
-                    erro = tabuleiro.jogada(coordenada.linha, coordenada.linha);
-                }
-            }
-            novoPonto = tabuleiro.condicao(coordenada.linha, coordenada.linha, erro, jogador);
-            tabuleiro.imprime();
-            if (novoPonto == true) {
-                System.out.println("Ponto! Jogador " + jogador + " joga novamente!");
-                tabuleiro.imprime();
-            } else {
-                switch (jogador) {
-                    case 1:
-                        jogador = 2;
-
-                        break;
-                    case 2:
-                        jogador = 1;
-                        break;
-                    default:
-                        jogador = 0;
-                        break;
-                }
-            }
-        }
-        System.out.println("Fim de Jogo!");*/
     }
 
-    public void imprimeFinal(String[][] tabuleiroFinal) {
+    public static void imprimeFinal() {
+        System.out.println("\n");
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
-                System.out.println(" " + tabuleiroFinal[i][j]);
+                System.out.print(tabuleiroFinal[i][j]);
             }
-            System.out.println("");
+            System.out.println();
         }
-        System.out.println("");
     }
 
-    public int fazAsJogadas(No no, boolean jogador, String[][] tabuleiroFinal) {
-        imprimeFinal(tabuleiroFinal);
+    public static int fazAsJogadas(No no, boolean jogador) {
+        imprimeFinal();
+        System.out.println("Mudança de Turno\n");
 
         int vencedor = no.finalizado();
         if (vencedor != 2) {
@@ -124,55 +79,55 @@ public class Dots {
                     }
                 }
 
-                Coordenada coordenada = new Coordenada(0,0);
+                Coordenada coordenada = new Coordenada(0, 0);
 
                 for (int i = 0; i < 5; i++) {
                     for (int j = 0; j < 5; j++) {
-                        if (!(no.filhos.get(posicaoDecidida).tabuleiro[i][j].equals(tabuleiroFinal[i][j])) && no.filhos.get(posicaoEscolhida).tabuleiro[i][j] != 2 && no.filhos.get(posicaoEscolhida).tabuleiro[i][j] != 1) {
+                        if (!(no.filhos.get(posicaoDecidida).tabuleiro[i][j].equals(tabuleiroFinal[i][j])) && !(no.filhos.get(posicaoDecidida).tabuleiro[i][j].equals("1")) && !(no.filhos.get(posicaoDecidida).tabuleiro[i][j].equals("2"))) {
                             coordenada.linha = i;
                             coordenada.coluna = j;
                         }
                     }
                 }
 
-                adicionaNoTabuleiro(no.filhos.get(posicaoDecidida).tabuleiro, tabuleiroFinal);
-                
+                adicionaNoTabuleiro(no.filhos.get(posicaoDecidida).tabuleiro);
 
                 if (no.filhos.get(posicaoDecidida).condicao(coordenada.linha, coordenada.coluna, true, false)) {
-                    fazAsJogadas(no, jogador, tabuleiroFinal);
+                    fazAsJogadas(no, jogador);
                 } else {
-                    fazAsJogadas(no, !jogador, tabuleiroFinal);
+                    fazAsJogadas(no, !jogador);
                 }
 
             } else {
                 int posicaoDecidida = 0;
                 Scanner sc = new Scanner(System.in);
-                System.out.println("Digite a posicao da jogada (Jogador " + jogador + "):");
+                Coordenada coordenada = new Coordenada(0,0);
+                System.out.println("Digite a posicao da jogada (Jogador 1):");
                 int jogada = sc.nextInt();
-                Coordenada coordenada = no.mapear(jogada);
-
-                boolean erro = no.jogada(coordenada.linha, coordenada.linha);
+                boolean erro = no.jogada(coordenada.linha, coordenada.coluna);
                 if (erro == false) {
                     while (erro == false) {
-                        coordenada.linha = sc.nextInt();
-                        coordenada.linha = sc.nextInt();
-                        erro = no.jogada(coordenada.linha, coordenada.linha);
+                        jogada = sc.nextInt();
+                        coordenada = No.mapear(jogada);
+                        erro = no.jogada(coordenada.linha, coordenada.coluna);
                     }
                 }
+
+                tabuleiroFinal[coordenada.linha][coordenada.coluna] = "-";
                 int contador = 0;
-                for( No filho : no.filhos){
-      
-                    if(igualdadeDosTabuleiros(no.tabuleiro, tabuleiroFinal)){
+                for (No filho : no.filhos) {
+
+                    if (igualdadeDosTabuleiros(filho.tabuleiro)) {
                         posicaoDecidida = contador;
                     }
                     contador++;
                 }
-                
-                if(no.filhos.get(posicaoDecidida).condicao(coordenada.linha, coordenada.coluna, erro, false)){
+
+                if (no.filhos.get(posicaoDecidida).condicao(coordenada.linha, coordenada.coluna, erro, true)) {
                     System.out.println("Ponto do jogador");
-                    fazAsJogadas(no, jogador, tabuleiroFinal);
-                } else{
-                    fazAsJogadas(no, !jogador, tabuleiroFinal);
+                    fazAsJogadas(no, jogador);
+                } else {
+                    fazAsJogadas(no, !jogador);
                 }
 
             }
@@ -180,19 +135,19 @@ public class Dots {
         }
         return 0;
     }
-    
-    public void adicionaNoTabuleiro(String[][] tabuleiro, String[][] tabuleiroFinal){
-        for(int i = 0; i < 5; i++){
-            for(int j = 0; j < 5; j++){
+
+    public static void adicionaNoTabuleiro(String[][] tabuleiro) {
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
                 tabuleiroFinal[i][j] = tabuleiro[i][j];
             }
         }
     }
-    
-    public boolean igualdadeDosTabuleiros(String[][] tabuleiro, String[][]tabuleiroFinal){
-        for(int i=0; i < 5; i++){
-            for(int j=0; j < 5; j++){
-                if(tabuleiro[i][j] != tabuleiroFinal[i][j]){
+
+    public static boolean igualdadeDosTabuleiros(String[][] tabuleiro) {
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                if (tabuleiro[i][j] != tabuleiroFinal[i][j]) {
                     return false;
                 }
             }
